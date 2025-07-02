@@ -7,8 +7,21 @@ import Portfolio from "../pages/Portfolio";
 import Contact from "../pages/Contact";
 import About from "../pages/About";
 import Process from "../pages/Process";
-import Industries from "../pages/Industries";
 import Layout from "../components/layout/Layout";
+import BrandIdentityDesign from "../pages/BrandIdentityDesign";
+import DigitalMarketing from "../pages/DigitalMarketing";
+import WebsiteDesign from "../pages/WebsiteDesign";
+import VideoServices from "../pages/VideoServices";
+import BrandMerchandising from "../pages/BrandMerchandising";
+import ContentCreations from "../pages/ContentCreations";
+import Advertisements from "../pages/Advertisements";
+import Packaging from "../pages/Packaging";
+import BrandPhotography from "../pages/BrandPhotography";
+import SpaceDesign from "../pages/SpaceDesign";
+import MotionGraphics from "../pages/MotionGraphics";
+import Login from '../pages/Login';
+import Register from '../pages/Register';
+import Careers from '../pages/Careers';
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -21,7 +34,21 @@ const AppRouter = () => (
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/process" element={<Process />} />
-        <Route path="/industries" element={<Industries />} />
+        <Route path="/Brand-Identity-Design" element={<BrandIdentityDesign />} />
+        <Route path="/digital-marketing" element={<DigitalMarketing />} />
+        <Route path="/website-design" element={<WebsiteDesign />} />
+        <Route path="/3d-rendering-services" element={<VideoServices />} />
+        <Route path="/Brand-Merchandising" element={<BrandMerchandising />} />
+        <Route path="/content-creations" element={<ContentCreations />} />
+        <Route path="/advertisements" element={<Advertisements />} />
+        <Route path="/packaging" element={<Packaging />} />
+        <Route path="/brand-photography" element={<BrandPhotography />} />
+        <Route path="/space-design" element={<SpaceDesign />} />
+        <Route path="/motion-graphics" element={<MotionGraphics />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/careers" element={<Careers />} />
+        
       </Routes>
     </Layout>
   </BrowserRouter>
