@@ -22,6 +22,12 @@ import MotionGraphics from "../pages/MotionGraphics";
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Careers from '../pages/Careers';
+import Testimonials from "../pages/Testimonials";
+import ServiceDetails from "../pages/ServiceDetails";
+import AdminDashboard from "../pages/AdminDashboard";
+import CustomerDashboard from "../pages/CustomerDashboard";
+import Blogs from "../pages/Blogs";
+import BlogsDetails from "../pages/BlogsDetails";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -48,7 +54,13 @@ const AppRouter = () => (
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/careers" element={<Careers />} />
-        
+        <Route path="/services" element={<Services />} />
+        <Route path="/services/:slug" element={<ServiceDetails />} />
+        <Route path="/testimonials" element={<Testimonials />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/blogs/:id" element={<BlogsDetails />} />
       </Routes>
     </Layout>
   </BrowserRouter>

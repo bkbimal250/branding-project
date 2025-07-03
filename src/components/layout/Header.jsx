@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { label } from 'framer-motion/client';
+import { useAuth } from '../AuthContext';
 
 const navLinks = [
   {
@@ -31,7 +32,7 @@ const navLinks = [
   {label:'Blogs',path:'/blogs'},
   { label: 'Careers', path: '/careers' },
   { label: 'Our Works', path: '/portfolio' },
-  { label: 'Sign In', path: '/login' },
+  // { label: 'Sign In', path: '/login' }, // Will be handled below
 ];
 
 const Header = () => {
@@ -40,6 +41,8 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const headerRef = useRef(null);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -236,6 +239,26 @@ const Header = () => {
             </div>
           ))}
 
+          {/* Auth section */}
+          {user ? (
+            <>
+              <span className="px-3 py-2 font-semibold text-cyan-200">{user.name || user.email || user.phone || user.role}</span>
+              <button
+                onClick={() => { logout(); navigate('/'); }}
+                className="px-3 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition ml-2"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="px-3 py-2 rounded-lg bg-cyan-600 text-white font-semibold hover:bg-cyan-700 transition ml-2"
+            >
+              Sign In
+            </Link>
+          )}
+
           <motion.div 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -359,6 +382,26 @@ const Header = () => {
                 )}
               </motion.div>
             ))}
+
+            {/* Auth section */}
+            {user ? (
+              <>
+                <span className="px-3 py-2 font-semibold text-cyan-200">{user.name || user.email || user.phone || user.role}</span>
+                <button
+                  onClick={() => { logout(); navigate('/'); }}
+                  className="px-3 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition ml-2"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="px-3 py-2 rounded-lg bg-cyan-600 text-white font-semibold hover:bg-cyan-700 transition ml-2"
+              >
+                Sign In
+              </Link>
+            )}
 
             <motion.div 
               className="flex items-center space-x-3 pt-4 px-4"
