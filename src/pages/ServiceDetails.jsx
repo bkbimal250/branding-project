@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { services } from "../data/services";
-import ServiceCard from "../components/layout/ServiceCard";
+import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import HeroSection from "../components/layout/HeroSection";
+import ServiceCard from "../components/layout/ServiceCard";
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const fadeIn = {
   hidden: { opacity: 0, y: 40 },
@@ -14,167 +16,125 @@ const fadeIn = {
   }),
 };
 
-const DEFAULT_HERO_IMAGE = "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=1200&q=80";
+const DEFAULT_HERO_IMAGE =
+  "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=1200&q=80";
 
 const ServiceDetails = () => {
   const { slug } = useParams();
-  const filtered = slug ? services.filter((s) => s.slug === slug) : services;
-  const isSingle = filtered.length === 1;
-  const service = isSingle ? filtered[0] : null;
+  const [service, setService] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/services/slug/${slug}`);
+        const serviceData = res.data?.data;
+        setService(serviceData);
+
+        // Fetch related services by category
+        const relatedRes = await axios.get(
+          `${BASE_URL}/services/category/${serviceData.category}`
+        );
+        const filteredRelated = relatedRes.data?.data?.filter(
+          (s) => s.slug !== slug
+        );
+        setRelated(filteredRelated);
+      } catch (err) {
+        setError("Failed to load service details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug) fetchService();
+  }, [slug]);
+
+  if (loading) return <div className="text-center py-20">Loading...</div>;
+  if (error) return <div className="text-center py-20 text-red-500">{error}</div>;
+  if (!service) return <div className="text-center py-20">Service not found.</div>;
 
   return (
     <div className="bg-white min-h-screen">
       <HeroSection
-        title={isSingle ? service.title : "Our Services"}
-        subtitle={isSingle ? service.shortDescription : "Explore all our creative and strategic services for your brand."}
-        backgroundImage={isSingle ? service.coverImage?.url : DEFAULT_HERO_IMAGE}
+        title={service.title}
+        subtitle={service.shortDescription}
+        backgroundImage={service.featuredImage || DEFAULT_HERO_IMAGE}
         breadcrumb={[
           { label: "Home", path: "/" },
           { label: "Services", path: "/services" },
-          ...(isSingle ? [{ label: service.title }] : [])
+          { label: service.title },
         ]}
       />
-      <div className="py-12 px-4">
-        <h1 className="text-4xl font-bold text-center mb-10 text-gray-900">
-          {isSingle ? service.title : "All Service Details"}
-        </h1>
-        {isSingle ? (
-          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
-            {/* Main Details */}
-            <motion.div
-              className="flex-1 bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-100 rounded-2xl shadow-lg p-8"
-              initial="hidden"
-              animate="visible"
-              variants={fadeIn}
-            >
-              <img
-                src={service.coverImage?.url}
-                alt={service.coverImage?.alt}
-                className="w-full h-56 object-cover rounded-xl mb-6 shadow-md"
-              />
-              <div className="text-lg text-gray-700 mb-4">{service.shortDescription}</div>
-              <div className="text-gray-600 mb-6">{service.description}</div>
-              <AnimatePresence>
-                {service.features && service.features.length > 0 && (
-                  <motion.div
-                    className="mb-4"
-                    initial="hidden"
-                    animate="visible"
-                    variants={fadeIn}
-                    custom={1}
-                  >
-                    <h3 className="text-xl font-semibold text-cyan-800 mb-2">Features</h3>
-                    <ul className="list-disc list-inside space-y-1">
-                      {service.features.map((feature, idx) => (
-                        <motion.li key={idx} className="text-gray-700" variants={fadeIn} custom={idx+2}>
-                          <span className="font-semibold">{feature.title}:</span> {feature.description}
-                        </motion.li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                )}
-                {service.process && service.process.length > 0 && (
-                  <motion.div
-                    className="mb-4"
-                    initial="hidden"
-                    animate="visible"
-                    variants={fadeIn}
-                    custom={2}
-                  >
-                    <h3 className="text-xl font-semibold text-cyan-800 mb-2">Process</h3>
-                    <ol className="list-decimal list-inside space-y-1">
-                      {service.process.map((step, idx) => (
-                        <motion.li key={idx} className="text-gray-700" variants={fadeIn} custom={idx+3}>
-                          <span className="font-semibold">{step.title}:</span> {step.description}
-                        </motion.li>
-                      ))}
-                    </ol>
-                  </motion.div>
-                )}
-                {service.deliverables && service.deliverables.length > 0 && (
-                  <motion.div
-                    className="mb-4"
-                    initial="hidden"
-                    animate="visible"
-                    variants={fadeIn}
-                    custom={3}
-                  >
-                    <h3 className="text-xl font-semibold text-cyan-800 mb-2">Deliverables</h3>
-                    <ul className="list-disc list-inside space-y-1">
-                      {service.deliverables.map((item, idx) => (
-                        <motion.li key={idx} className="text-gray-700" variants={fadeIn} custom={idx+4}>{item}</motion.li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                )}
-                {service.gallery && service.gallery.length > 0 && (
-                  <motion.div
-                    className="mb-4"
-                    initial="hidden"
-                    animate="visible"
-                    variants={fadeIn}
-                    custom={4}
-                  >
-                    <h3 className="text-xl font-semibold text-cyan-800 mb-2">Gallery</h3>
-                    <div className="flex flex-wrap gap-4">
-                      {service.gallery.map((img, idx) => (
-                        <motion.img key={idx} src={img.url} alt={img.alt} className="w-32 h-24 object-cover rounded-lg border" variants={fadeIn} custom={idx+5} />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-                {service.faqs && service.faqs.length > 0 && (
-                  <motion.div
-                    className="mb-4"
-                    initial="hidden"
-                    animate="visible"
-                    variants={fadeIn}
-                    custom={5}
-                  >
-                    <h3 className="text-xl font-semibold text-cyan-800 mb-2">FAQs</h3>
-                    <ul className="space-y-2">
-                      {service.faqs.map((faq, idx) => (
-                        <motion.li key={idx} variants={fadeIn} custom={idx+6}>
-                          <span className="font-semibold">Q: {faq.question}</span>
-                          <div className="ml-2 text-gray-700">A: {faq.answer}</div>
-                        </motion.li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-            {/* Sidebar: Similar Services */}
-            <aside className="w-full lg:w-80 flex-shrink-0">
-              <h2 className="text-xl font-bold text-cyan-700 mb-4">Similar Services</h2>
-              <motion.div
-                className="space-y-4"
-                initial="hidden"
-                animate="visible"
-              >
-                <AnimatePresence>
-                  {services
-                    .filter((s) => s.category === service.category && s.slug !== service.slug)
-                    .map((sim, idx) => (
-                      <ServiceCard key={sim.slug} service={sim} index={idx} />
-                    ))}
-                </AnimatePresence>
-              </motion.div>
-            </aside>
-          </div>
-        ) : (
-          <motion.div
-            className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            initial="hidden"
-            animate="visible"
-          >
+
+      <div className="py-12 px-4 max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+        {/* --- Main Content --- */}
+        <motion.div
+          className="flex-1 bg-gradient-to-br from-cyan-50 to-blue-50 border border-cyan-100 rounded-2xl shadow-lg p-8"
+          initial="hidden"
+          animate="visible"
+          variants={fadeIn}
+        >
+          <img
+            src={service.featuredImage}
+            alt={service.title}
+            className="w-full h-64 object-cover rounded-xl mb-6 shadow-md"
+          />
+
+          <div className="text-lg text-gray-700 mb-4">{service.shortDescription}</div>
+          <div className="text-gray-600 mb-6">{service.description}</div>
+
+          {/* Features */}
+          {service.features?.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-cyan-800 mb-2">Features</h3>
+              <ul className="list-disc list-inside text-gray-700 space-y-1">
+                {service.features.map((feature, idx) => (
+                  <li key={idx}>{feature}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Technologies */}
+          {service.technologies?.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-cyan-800 mb-2">Technologies Used</h3>
+              <ul className="flex flex-wrap gap-2 text-sm text-white">
+                {service.technologies.map((tech, idx) => (
+                  <li key={idx} className="bg-cyan-600 px-3 py-1 rounded-full">{tech}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Tags */}
+          {service.tags?.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-cyan-800 mb-2">Tags</h3>
+              <div className="flex flex-wrap gap-2 text-sm">
+                {service.tags.map((tag, idx) => (
+                  <span key={idx} className="bg-gray-200 px-3 py-1 rounded-full text-gray-700">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </motion.div>
+
+        {/* --- Sidebar --- */}
+        <aside className="w-full lg:w-80 flex-shrink-0">
+          <h2 className="text-xl font-bold text-cyan-700 mb-4">Related Services</h2>
+          <motion.div className="space-y-4" initial="hidden" animate="visible">
             <AnimatePresence>
-              {services.map((service, idx) => (
-                <ServiceCard key={service.slug} service={service} index={idx} />
+              {related?.map((item, idx) => (
+                <ServiceCard key={item._id} service={item} index={idx} />
               ))}
             </AnimatePresence>
           </motion.div>
-        )}
+        </aside>
       </div>
     </div>
   );

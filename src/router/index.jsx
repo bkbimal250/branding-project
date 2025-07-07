@@ -28,12 +28,17 @@ import AdminDashboard from "../pages/AdminDashboard";
 import CustomerDashboard from "../pages/CustomerDashboard";
 import Blogs from "../pages/Blogs";
 import BlogsDetails from "../pages/BlogsDetails";
+import NotFound from "../pages/NotFound";
+import WorkDetail from "../pages/WorkDetail";
+import ScrollTop from "../components/ScrollTop";
 
 const AppRouter = () => (
   <BrowserRouter>
+    <ScrollTop />
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="*" element={ <NotFound /> } />
         <Route path="/services" element={<Services />} />
         <Route path="/faq" element={<FAQs />} />
         <Route path="/portfolio" element={<Portfolio />} />
@@ -61,6 +66,7 @@ const AppRouter = () => (
         <Route path="/customer-dashboard" element={<CustomerDashboard />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blogs/:id" element={<BlogsDetails />} />
+        <Route path="work/:id" element={<WorkDetail />} />
       </Routes>
     </Layout>
   </BrowserRouter>

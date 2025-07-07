@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, Moon, Sun } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { label } from 'framer-motion/client';
 import { useAuth } from '../AuthContext';
@@ -32,7 +32,7 @@ const navLinks = [
   {label:'Blogs',path:'/blogs'},
   { label: 'Careers', path: '/careers' },
   { label: 'Our Works', path: '/portfolio' },
-  // { label: 'Sign In', path: '/login' }, // Will be handled below
+  
 ];
 
 const Header = () => {
@@ -43,6 +43,22 @@ const Header = () => {
   const headerRef = useRef(null);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') === 'dark';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -141,7 +157,7 @@ const Header = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
-      className={`bg-gradient-to-r from-[#1a2980] via-[#26d0ce] to-[#1e3c72] text-white shadow-2xl sticky top-0 z-50 transition-all duration-300 ${
+      className={`bg-gradient-brand text-black dark:bg-gray-900 dark:text-white shadow-2xl sticky top-0 z-50 transition-all duration-300 ${
         scrolled ? 'py-2 shadow-lg' : 'py-4'
       }`}
     >
@@ -159,11 +175,11 @@ const Header = () => {
               className="w-10 h-10 sm:w-14 sm:h-14 drop-shadow-xl rounded-full bg-white p-1 border-2 border-cyan-400"
             />
             <motion.span 
-              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-lg"
-              whileHover={{ color: '#22d3ee' }}
+              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black drop-shadow-lg"
+              whileHover={{ color: '#6b0d0e' }}
               transition={{ duration: 0.2 }}
             >
-              invert<span className="text-cyan-400">visuals</span>
+              invert<span className="text-brand-red">visuals</span>
             </motion.span>
           </Link>
         </motion.div>
@@ -175,9 +191,11 @@ const Header = () => {
               {item.submenu ? (
                 <>
                   <motion.button
-                    whileHover={{ color: '#22d3ee' }}
+                    whileHover={{ color: '#6b0d0e' }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center px-3 py-2 rounded-lg hover:bg-cyan-900/30 focus-visible:ring-2 focus-visible:ring-cyan-400 transition-all duration-200 focus:outline-none"
+                    className={`flex items-center px-3 py-2 rounded-lg hover:bg-brand-red-light/30 focus-visible:ring-2 focus-visible:ring-brand-red transition-all duration-200 focus:outline-none ${
+                      item.submenu?.some(sub => location.pathname === sub.path) ? 'bg-blue-600 text-white font-semibold' : ''
+                    }`}
                     aria-haspopup="true"
                     aria-expanded={dropdown === idx}
                     onClick={() => toggleDropdown(idx)}
@@ -211,7 +229,7 @@ const Header = () => {
                           >
                             <Link
                               to={sub.path}
-                              className="block px-5 py-2.5 font-medium hover:bg-cyan-50 hover:text-cyan-700 transition-colors duration-150 focus:bg-cyan-100 focus:text-cyan-700 focus:outline-none"
+                              className="block px-5 py-2.5 font-medium hover:bg-brand-creme hover:text-brand-red transition-colors duration-150 focus:bg-brand-creme-light focus:text-brand-red focus:outline-none"
                               tabIndex={0}
                             >
                               {sub.label}
@@ -229,7 +247,9 @@ const Header = () => {
                 >
                   <Link
                     to={item.path}
-                    className="flex items-center px-3 py-2 rounded-lg hover:bg-cyan-900/30 hover:text-cyan-400 focus-visible:ring-2 focus-visible:ring-cyan-400 transition-colors duration-200 focus:outline-none"
+                    className={`flex items-center px-3 py-2 rounded-lg hover:bg-brand-red-light/30 hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red transition-colors duration-200 focus:outline-none ${
+                      location.pathname === item.path ? 'bg-blue-600 text-white font-semibold' : ''
+                    }`}
                     tabIndex={0}
                   >
                     {item.label}
@@ -242,10 +262,10 @@ const Header = () => {
           {/* Auth section */}
           {user ? (
             <>
-              <span className="px-3 py-2 font-semibold text-cyan-200">{user.name || user.email || user.phone || user.role}</span>
+              <span className="px-3 py-2 font-semibold text-black">{user.name || user.email || user.phone || user.role}</span>
               <button
                 onClick={() => { logout(); navigate('/'); }}
-                className="px-3 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition ml-2"
+                className="px-3 py-2 rounded-lg bg-brand-red text-white font-semibold hover:bg-brand-red-light transition ml-2"
               >
                 Logout
               </button>
@@ -253,7 +273,7 @@ const Header = () => {
           ) : (
             <Link
               to="/login"
-              className="px-3 py-2 rounded-lg bg-cyan-600 text-white font-semibold hover:bg-cyan-700 transition ml-2"
+              className="px-3 py-2 rounded-lg bg-brand-creme text-brand-red font-semibold hover:bg-brand-creme-light transition ml-2"
             >
               Sign In
             </Link>
@@ -262,18 +282,27 @@ const Header = () => {
           <motion.div 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center space-x-1 cursor-pointer px-3 py-2 rounded-lg hover:bg-cyan-900/30 hover:text-cyan-400 focus-visible:ring-2 focus-visible:ring-cyan-400 transition-colors duration-200"
+            className="flex items-center space-x-1 cursor-pointer px-3 py-2 rounded-lg hover:bg-brand-red-light/30 hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red transition-colors duration-200"
           >
             {indiaFlag}
             <span className="font-bold text-sm lg:text-base">India</span>
           </motion.div>
         </nav>
 
+        {/* Dark mode toggle button */}
+        <button
+          onClick={() => setDarkMode((prev) => !prev)}
+          className="ml-4 p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Toggle dark mode"
+        >
+          {darkMode ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
+        </button>
+
         {/* Let's Talk Button */}
         <motion.button
-          whileHover={{ scale: 1.05, boxShadow: '0 10px 25px -5px rgba(34, 211, 238, 0.4)' }}
+          whileHover={{ scale: 1.05, boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.4)' }}
           whileTap={{ scale: 0.95 }}
-          className="hidden md:block ml-4 lg:ml-6 bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold px-6 lg:px-8 py-2 lg:py-3 rounded-full shadow-lg hover:text-white transition-all duration-200 text-sm lg:text-base focus-visible:ring-2 focus-visible:ring-cyan-400 focus:outline-none"
+          className="hidden md:block ml-4 lg:ml-6 bg-blue-600 text-white font-bold px-6 lg:px-8 py-2 lg:py-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 text-sm lg:text-base focus-visible:ring-2 focus-visible:ring-blue-400 focus:outline-none"
         >
           LET'S TALK
         </motion.button>
@@ -282,7 +311,7 @@ const Header = () => {
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="md:hidden text-white focus:outline-none"
+          className="md:hidden text-black focus:outline-none"
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           onClick={() => setMobileOpen(!mobileOpen)}
         >
@@ -298,12 +327,12 @@ const Header = () => {
             animate="visible"
             exit="exit"
             variants={menuVariants}
-            className="md:hidden fixed inset-0 w-full h-full bg-[#0a1124]/95 text-white px-6 pt-24 pb-8 space-y-6 z-40 overflow-y-auto"
+            className="md:hidden fixed inset-0 w-full h-full bg-brand-creme/95 text-black px-6 pt-24 pb-8 space-y-6 z-40 overflow-y-auto"
             style={{ backdropFilter: 'blur(10px)' }}
             aria-hidden={!mobileOpen}
           >
             <button
-              className="absolute top-6 right-6 text-white focus:outline-none"
+              className="absolute top-6 right-6 text-black focus:outline-none"
               aria-label="Close menu"
               onClick={() => setMobileOpen(false)}
             >
@@ -322,7 +351,9 @@ const Header = () => {
                 {item.submenu ? (
                   <>
                     <button
-                      className="flex items-center justify-between w-full text-left text-lg font-semibold py-3 px-4 rounded-lg hover:bg-cyan-900/30 hover:text-cyan-400 focus-visible:ring-2 focus-visible:ring-cyan-400 transition-colors duration-200"
+                      className={`flex items-center justify-between w-full text-left text-lg font-semibold py-3 px-4 rounded-lg hover:bg-brand-red/20 hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red transition-colors duration-200 ${
+                        item.submenu?.some(sub => location.pathname === sub.path) ? 'bg-blue-600 text-white' : ''
+                      }`}
                       onClick={() => toggleDropdown(idx)}
                       aria-haspopup="true"
                       aria-expanded={dropdown === idx}
@@ -353,7 +384,7 @@ const Header = () => {
                             >
                               <Link
                                 to={sub.path}
-                                className="block px-6 py-3 font-medium hover:text-cyan-400 transition-colors duration-150 focus:text-cyan-400 focus:outline-none"
+                                className="block px-6 py-3 font-medium hover:text-brand-red transition-colors duration-150 focus:text-brand-red focus:outline-none"
                                 onClick={() => setMobileOpen(false)}
                                 tabIndex={0}
                               >
@@ -372,7 +403,9 @@ const Header = () => {
                   >
                     <Link
                       to={item.path}
-                      className="block text-lg font-semibold py-3 px-4 rounded-lg hover:bg-cyan-900/30 hover:text-cyan-400 transition-colors duration-200 focus:outline-none"
+                      className={`block text-lg font-semibold py-3 px-4 rounded-lg hover:bg-brand-red/20 hover:text-brand-red transition-colors duration-200 focus:outline-none ${
+                        location.pathname === item.path ? 'bg-blue-600 text-white' : ''
+                      }`}
                       onClick={() => setMobileOpen(false)}
                       tabIndex={0}
                     >
@@ -386,7 +419,7 @@ const Header = () => {
             {/* Auth section */}
             {user ? (
               <>
-                <span className="px-3 py-2 font-semibold text-cyan-200">{user.name || user.email || user.phone || user.role}</span>
+                <span className="px-3 py-2 font-semibold text-black">{user.name || user.email || user.phone || user.role}</span>
                 <button
                   onClick={() => { logout(); navigate('/'); }}
                   className="px-3 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition ml-2"
@@ -424,7 +457,7 @@ const Header = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold px-8 py-3 rounded-full shadow-lg hover:text-white transition-all duration-200 text-lg focus-visible:ring-2 focus-visible:ring-cyan-400 focus:outline-none"
+                className="w-full bg-blue-600 text-white font-bold px-8 py-3 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 text-lg focus-visible:ring-2 focus-visible:ring-blue-400 focus:outline-none"
               >
                 LET'S TALK
               </motion.button>
