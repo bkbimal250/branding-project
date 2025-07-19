@@ -24,19 +24,28 @@ import Register from '../pages/Register';
 import Careers from '../pages/Careers';
 import Testimonials from "../pages/Testimonials";
 import ServiceDetails from "../pages/ServiceDetails";
-import AdminDashboard from "../pages/AdminDashboard";
-import CustomerDashboard from "../pages/CustomerDashboard";
 import Blogs from "../pages/Blogs";
 import BlogsDetails from "../pages/BlogsDetails";
 import NotFound from "../pages/NotFound";
 import WorkDetail from "../pages/WorkDetail";
 import ScrollTop from "../components/ScrollTop";
+import AdminDashboard from "../admindashboard/AdminDashboard";
+// Admin section pages
+import AdminBlogs from "../admindashboard/Sections/Blogs/AdminBlogs";
+import AdminServices from "../admindashboard/Sections/Services/AdminServices";
+import AdminWorks from "../admindashboard/Sections/Works/AdminWorks";
+import AdminServiceEdit from "../admindashboard/Sections/Services/AdminServiceEdit";
+import ProtectedRoute from '../components/ProtectedRoute';
+import AdminLayout from "../admindashboard/AdminLayout";
+import AddService from "../admindashboard/addService";
 
 const AppRouter = () => (
   <BrowserRouter>
     <ScrollTop />
-    <Layout>
-      <Routes>
+    <Routes>
+      {/* Public/User routes with Layout */}
+      <Route element={<Layout />}>
+
         <Route path="/" element={<Home />} />
         <Route path="*" element={ <NotFound /> } />
         <Route path="/services" element={<Services />} />
@@ -62,13 +71,25 @@ const AppRouter = () => (
         <Route path="/services" element={<Services />} />
         <Route path="/services/:slug" element={<ServiceDetails />} />
         <Route path="/testimonials" element={<Testimonials />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/customer-dashboard" element={<CustomerDashboard />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blogs/:id" element={<BlogsDetails />} />
         <Route path="work/:id" element={<WorkDetail />} />
-      </Routes>
-    </Layout>
+      </Route>
+      
+      {/* Admin routes with AdminLayout */}
+      <Route path="/admin/dashboard" element={
+        <ProtectedRoute adminOnly>
+          <AdminLayout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<AdminDashboard />} />
+        <Route path="blogs" element={<AdminBlogs />} />
+        <Route path="services" element={<AdminServices />} />
+        <Route path="services/edit/:id" element={<AdminServiceEdit />} />
+        <Route path="services/add" element={<AddService />} />
+        <Route path="works" element={<AdminWorks />} />
+      </Route>
+    </Routes>
   </BrowserRouter>
 );
 

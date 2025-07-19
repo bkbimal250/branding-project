@@ -5,28 +5,34 @@ import axios from 'axios';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const Register = () => {
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [profileImage, setProfileImage] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const handleImageChange = (e) => {
+    setProfileImage(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !email || !phone || !password) {
+    if (!username || !email || !password) {
       setError('Please fill in all fields.');
       return;
     }
     setError('');
     setLoading(true);
     try {
-      await axios.post(`${BASE_URL}/auth/register`, {
-        name,
-        email,
-        phone,
-        password
+      const formData = new FormData();
+      formData.append('username', username);
+      formData.append('email', email);
+      formData.append('password', password);
+      if (profileImage) formData.append('profileImage', profileImage);
+      await axios.post(`${BASE_URL}/api/b1/auth/register`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       navigate('/login');
     } catch (err) {
@@ -45,12 +51,12 @@ const Register = () => {
         {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1 font-medium">Name</label>
+            <label className="block mb-1 font-medium">Username</label>
             <input
               type="text"
               className="w-full px-3 py-2 border rounded"
-              value={name}
-              onChange={e => setName(e.target.value)}
+              value={username}
+              onChange={e => setUsername(e.target.value)}
               required
             />
           </div>
@@ -65,16 +71,6 @@ const Register = () => {
             />
           </div>
           <div>
-            <label className="block mb-1 font-medium">Phone</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border rounded"
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
-              required
-            />
-          </div>
-          <div>
             <label className="block mb-1 font-medium">Password</label>
             <input
               type="password"
@@ -82,6 +78,15 @@ const Register = () => {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
+            />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium">Profile Image (optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full"
             />
           </div>
           <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition" disabled={loading}>

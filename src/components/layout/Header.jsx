@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown, Moon, Sun } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { label } from 'framer-motion/client';
 import { useAuth } from '../AuthContext';
@@ -30,9 +30,7 @@ const navLinks = [
     ],
   },
   {label:'Blogs',path:'/blogs'},
-  { label: 'Careers', path: '/careers' },
   { label: 'Our Works', path: '/portfolio' },
-  
 ];
 
 const Header = () => {
@@ -43,30 +41,12 @@ const Header = () => {
   const headerRef = useRef(null);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') === 'dark';
-    }
-    return false;
-  });
 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [darkMode]);
-
-  // Close mobile menu when route changes
   useEffect(() => {
     setMobileOpen(false);
     setDropdown(null);
   }, [location]);
 
-  // Header scroll effect
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
@@ -79,7 +59,6 @@ const Header = () => {
     return () => document.removeEventListener('scroll', handleScroll);
   }, [scrolled]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (headerRef.current && !headerRef.current.contains(event.target)) {
@@ -94,10 +73,6 @@ const Header = () => {
   const toggleDropdown = (index) => {
     setDropdown(dropdown === index ? null : index);
   };
-
-  const indiaFlag = (
-    <span role="img" aria-label="India" className="text-2xl">🇮🇳</span>
-  );
 
   const menuVariants = {
     hidden: { opacity: 0, x: '-100%' },
@@ -157,7 +132,7 @@ const Header = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
-      className={`bg-gradient-brand text-black dark:bg-gray-900 dark:text-white shadow-2xl sticky top-0 z-50 transition-all duration-300 ${
+      className={`bg-gradient-brand text-black shadow-2xl sticky top-0 z-50 transition-all duration-300 ${
         scrolled ? 'py-2 shadow-lg' : 'py-4'
       }`}
     >
@@ -278,25 +253,7 @@ const Header = () => {
               Sign In
             </Link>
           )}
-
-          <motion.div 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center space-x-1 cursor-pointer px-3 py-2 rounded-lg hover:bg-brand-red-light/30 hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red transition-colors duration-200"
-          >
-            {indiaFlag}
-            <span className="font-bold text-sm lg:text-base">India</span>
-          </motion.div>
         </nav>
-
-        {/* Dark mode toggle button */}
-        <button
-          onClick={() => setDarkMode((prev) => !prev)}
-          className="ml-4 p-2 rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          aria-label="Toggle dark mode"
-        >
-          {darkMode ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
-        </button>
 
         {/* Let's Talk Button */}
         <motion.button
@@ -436,16 +393,7 @@ const Header = () => {
               </Link>
             )}
 
-            <motion.div 
-              className="flex items-center space-x-3 pt-4 px-4"
-              custom={navLinks.length}
-              initial="hidden"
-              animate="visible"
-              variants={itemVariants}
-            >
-              {indiaFlag}
-              <span className="font-bold text-lg">India</span>
-            </motion.div>
+            {/* Removed India flag and country name from mobile nav */}
 
             <motion.div
               custom={navLinks.length + 1}
