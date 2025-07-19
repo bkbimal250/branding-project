@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FiSend } from "react-icons/fi";
 import { useForm } from "react-hook-form";
@@ -13,14 +13,30 @@ const EnquiryForm = () => {
     formState: { errors }
   } = useForm();
 
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const onSubmit = async (data) => {
+    setSuccessMsg("");
+    setErrorMsg("");
+    setLoading(true);
+    // Map frontend fields to backend fields
+    const payload = {
+      name: data.name,
+      email: data.email, // Not used by backend, but can be stored for future
+      phone: data.phone,
+      location: data.address, // Map address to location
+      services: data.subject, // Map subject to services
+      message: data.message
+    };
     try {
-      const response = await axios.post(`${BASE_URL}/enquiry`, data);
-      console.log("Form submitted successfully:", response.data);
-      alert("Your enquiry has been submitted successfully!");
+      await axios.post(`${BASE_URL}/api/b1/enquiry`, payload);
+      setSuccessMsg("Your enquiry has been submitted successfully!");
     } catch (error) {
-      console.error("Error submitting the form:", error);
-      alert("Something went wrong while sending your enquiry.");
+      setErrorMsg("Something went wrong while sending your enquiry.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,6 +49,16 @@ const EnquiryForm = () => {
     >
       <div className="p-8">
         <h3 className="text-2xl font-bold text-gray-800 mb-6">Send us a message</h3>
+        {successMsg && (
+          <div className="mb-4 p-3 rounded bg-green-100 text-green-700 font-semibold text-center">
+            {successMsg}
+          </div>
+        )}
+        {errorMsg && (
+          <div className="mb-4 p-3 rounded bg-red-100 text-red-700 font-semibold text-center">
+            {errorMsg}
+          </div>
+        )}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
           {/* Name */}
@@ -92,7 +118,7 @@ const EnquiryForm = () => {
             {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>}
           </div>
 
-          {/* Address */}
+          {/* Address (Location) */}
           <div>
             <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
               Address
@@ -107,31 +133,30 @@ const EnquiryForm = () => {
             {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>}
           </div>
 
- {/* Subject (Dropdown) */}
-<div>
-  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-    Subject
-  </label>
-  <select
-    id="subject"
-    {...register("subject", { required: "Please select a subject" })}
-    className={`w-full px-4 py-3 rounded-lg border ${errors.subject ? "border-red-500" : "border-gray-300"} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition`}
-    defaultValue=""
-  >
-    <option value="" disabled>Choose Services</option>
-    <option value="Brand Identity Design" >Brand Identity Design</option>
-    <option value="Package Design">Package Design</option>
-    <option value="Branding">Branding </option>
-    <option value="2d video Services">2d video Services</option>
-    <option value="3d video Services">3d video Services</option>
-    <option value="Website Design">Website Design</option>
-    <option value="Digital Marketing">Digital Marketing</option>
-    <option value="Motion Graphics">Motion Graphics</option>
-    <option value="Brand Merchandising">Brand Merchandising</option>
-  </select>
-  {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>}
-</div>
-
+          {/* Subject (Services) Dropdown */}
+          <div>
+            <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+              Subject
+            </label>
+            <select
+              id="subject"
+              {...register("subject", { required: "Please select a subject" })}
+              className={`w-full px-4 py-3 rounded-lg border ${errors.subject ? "border-red-500" : "border-gray-300"} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition`}
+              defaultValue=""
+            >
+              <option value="" disabled>Choose Services</option>
+              <option value="Brand Identity Design" >Brand Identity Design</option>
+              <option value="Package Design">Package Design</option>
+              <option value="Branding">Branding </option>
+              <option value="2d video Services">2d video Services</option>
+              <option value="3d video Services">3d video Services</option>
+              <option value="Website Design">Website Design</option>
+              <option value="Digital Marketing">Digital Marketing</option>
+              <option value="Motion Graphics">Motion Graphics</option>
+              <option value="Brand Merchandising">Brand Merchandising</option>
+            </select>
+            {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>}
+          </div>
 
           {/* Message */}
           <div>
@@ -153,10 +178,11 @@ const EnquiryForm = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center space-x-2 hover:shadow-lg transition-all duration-300"
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center space-x-2 hover:shadow-lg transition-all duration-300 disabled:opacity-60"
+            disabled={loading}
           >
             <FiSend />
-            <span>Send Message</span>
+            <span>{loading ? "Sending..." : "Send Message"}</span>
           </motion.button>
         </form>
       </div>

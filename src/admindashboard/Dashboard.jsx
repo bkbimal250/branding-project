@@ -23,12 +23,13 @@ const Dashboard = () => {
           axios.get(`${BASE_URL}/api/b1/enquiry`, { headers: { Authorization: `Bearer ${adminToken}` } }),
         ]);
         setCounts({
-          services: servicesRes.data.length,
-          works: worksRes.data.length,
-          blogs: blogsRes.data.length,
-          enquiries: enquiriesRes.data.length,
+          services: Array.isArray(servicesRes.data) ? servicesRes.data.length : 0,
+          works: Array.isArray(worksRes.data) ? worksRes.data.length : 0,
+          blogs: Array.isArray(blogsRes.data) ? blogsRes.data.length : 0,
+          enquiries: Array.isArray(enquiriesRes.data) ? enquiriesRes.data.length : 0,
         });
       } catch (err) {
+        setCounts({ services: 0, works: 0, blogs: 0, enquiries: 0 });
         setError('Failed to fetch dashboard data.');
       } finally {
         setLoading(false);
@@ -53,19 +54,19 @@ const Dashboard = () => {
         ) : (
           <>
             <div className="bg-gradient-to-br from-cyan-100 to-cyan-300 rounded-xl shadow p-6 flex flex-col items-center hover:scale-105 transition-transform">
-              <span className="text-3xl font-bold text-cyan-700">{counts.services}</span>
+              <span className="text-3xl font-bold text-cyan-700">{counts.services ?? 0}</span>
               <span className="text-gray-700 mt-2 font-medium">Services</span>
             </div>
             <div className="bg-gradient-to-br from-blue-100 to-blue-300 rounded-xl shadow p-6 flex flex-col items-center hover:scale-105 transition-transform">
-              <span className="text-3xl font-bold text-blue-700">{counts.works}</span>
+              <span className="text-3xl font-bold text-blue-700">{counts.works ?? 0}</span>
               <span className="text-gray-700 mt-2 font-medium">Works</span>
             </div>
             <div className="bg-gradient-to-br from-pink-100 to-pink-300 rounded-xl shadow p-6 flex flex-col items-center hover:scale-105 transition-transform">
-              <span className="text-3xl font-bold text-pink-700">{counts.blogs}</span>
+              <span className="text-3xl font-bold text-pink-700">{counts.blogs ?? 0}</span>
               <span className="text-gray-700 mt-2 font-medium">Blogs</span>
             </div>
             <div className="bg-gradient-to-br from-green-100 to-green-300 rounded-xl shadow p-6 flex flex-col items-center hover:scale-105 transition-transform">
-              <span className="text-3xl font-bold text-green-700">{counts.enquiries}</span>
+              <span className="text-3xl font-bold text-green-700">{counts.enquiries ?? 0}</span>
               <span className="text-gray-700 mt-2 font-medium">Enquiries</span>
             </div>
           </>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { label } from 'framer-motion/client';
 import { useAuth } from '../AuthContext';
@@ -8,6 +8,7 @@ import { useAuth } from '../AuthContext';
 const navLinks = [
   {
     label: 'Services',
+    path: '/services',
     submenu: [
       { label: 'Brand Identity Design', path: '/Brand-Identity-Design' },
       { label: 'Digital Marketing', path: '/digital-marketing' },
@@ -30,13 +31,14 @@ const navLinks = [
     ],
   },
   {label:'Blogs',path:'/blogs'},
-  { label: 'Our Works', path: '/portfolio' },
+  { label: 'Our Works', path: '/our-works' },
 ];
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdown, setDropdown] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [userDropdown, setUserDropdown] = useState(false);
   const location = useLocation();
   const headerRef = useRef(null);
   const navigate = useNavigate();
@@ -236,15 +238,47 @@ const Header = () => {
 
           {/* Auth section */}
           {user ? (
-            <>
-              <span className="px-3 py-2 font-semibold text-black">{user.name || user.email || user.phone || user.role}</span>
+            <div className="relative">
               <button
-                onClick={() => { logout(); navigate('/'); }}
-                className="px-3 py-2 rounded-lg bg-brand-red text-white font-semibold hover:bg-brand-red-light transition ml-2"
+                className="px-3 py-2 font-semibold text-black hover:underline focus:outline-none flex items-center"
+                onClick={() => setUserDropdown((prev) => !prev)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
               >
-                Logout
+                {user.name || user.email || user.phone || user.role}
+                {userDropdown ? <ChevronUp className="ml-1 w-4 h-4" /> : <ChevronDown className="ml-1 w-4 h-4" />}
               </button>
-            </>
+              {userDropdown && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
+                  <button
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    onClick={() => { setUserDropdown(false); navigate('/profile'); }}
+                  >
+                    Profile
+                  </button>
+                  {user.role === 'admin' ? (
+                    <button
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                      onClick={() => { setUserDropdown(false); navigate('/admin/dashboard'); }}
+                    >
+                      Admin Dashboard
+                    </button>
+                  ) : (
+                    <button
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                      onClick={() => { setUserDropdown(false); navigate('/'); }}
+                    >
+                      Home
+                    </button>
+                  )}
+                  <button
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                    onClick={() => { setUserDropdown(false); logout(); navigate('/'); }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <Link
               to="/login"
@@ -375,15 +409,47 @@ const Header = () => {
 
             {/* Auth section */}
             {user ? (
-              <>
-                <span className="px-3 py-2 font-semibold text-black">{user.name || user.email || user.phone || user.role}</span>
+              <div className="relative mt-4">
                 <button
-                  onClick={() => { logout(); navigate('/'); }}
-                  className="px-3 py-2 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 transition ml-2"
+                  className="px-3 py-2 font-semibold text-black hover:underline focus:outline-none w-full text-left flex items-center"
+                  onClick={() => setUserDropdown((prev) => !prev)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                 >
-                  Logout
+                  {user.name || user.email || user.phone || user.role}
+                  {userDropdown ? <ChevronUp className="ml-1 w-4 h-4" /> : <ChevronDown className="ml-1 w-4 h-4" />}
                 </button>
-              </>
+                {userDropdown && (
+                  <div className="absolute left-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
+                    <button
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                      onClick={() => { setUserDropdown(false); navigate('/profile'); setMobileOpen(false); }}
+                    >
+                      Profile
+                    </button>
+                    {user.role === 'admin' ? (
+                      <button
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                        onClick={() => { setUserDropdown(false); navigate('/admin/dashboard'); setMobileOpen(false); }}
+                      >
+                        Admin Dashboard
+                      </button>
+                    ) : (
+                      <button
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                        onClick={() => { setUserDropdown(false); navigate('/'); setMobileOpen(false); }}
+                      >
+                        Home
+                      </button>
+                    )}
+                    <button
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                      onClick={() => { setUserDropdown(false); logout(); navigate('/'); setMobileOpen(false); }}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link
                 to="/login"

@@ -27,13 +27,13 @@ const services = {
 const companyLinks = [
   { label: 'About Us', path: '/about' },
   { label: 'Our Team', path: '/team' },
-  { label: 'Portfolio', path: '/portfolio' },
+  { label: 'Portfolio', path: '/our-works' },
   { label: 'Testimonials', path: '/testimonials' },
   { label: 'Careers', path: '/careers' }
 ];
 
 const resourceLinks = [
-  { label: 'Blog', path: '/blog' },
+  { label: 'Blog', path: '/blogs' },
   { label: 'Case Studies', path: '/case-studies' },
   { label: 'FAQ', path: '/faq' },
   { label: 'Pricing', path: '/pricing' },

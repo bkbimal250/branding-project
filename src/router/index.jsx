@@ -38,6 +38,8 @@ import AdminServiceEdit from "../admindashboard/Sections/Services/AdminServiceEd
 import ProtectedRoute from '../components/ProtectedRoute';
 import AdminLayout from "../admindashboard/AdminLayout";
 import AddService from "../admindashboard/addService";
+import OurWorks from "../pages/OurWorks";
+import Profile from "../pages/Profile";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -74,6 +76,8 @@ const AppRouter = () => (
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/blogs/:id" element={<BlogsDetails />} />
         <Route path="work/:id" element={<WorkDetail />} />
+        <Route path="/our-works" element={<OurWorks />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
       
       {/* Admin routes with AdminLayout */}
